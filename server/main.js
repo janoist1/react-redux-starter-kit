@@ -67,7 +67,6 @@ export default async () => {
       debug('Read client info.')
       fs.readJSON(paths.dist(config.universal.client_info), (err, data) => {
         if (err) {
-          clientInfo = {}
           debug('Failed to read client_data!')
           return
         }
@@ -94,5 +93,5 @@ export default async () => {
     app.use(um.default(() => clientInfo))
   }
 
-  return Promise.resolve(app)
+  return app
 }

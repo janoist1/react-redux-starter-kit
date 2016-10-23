@@ -2,7 +2,6 @@ import Koa from 'koa'
 import convert from 'koa-convert'
 import webpack from 'webpack'
 import webpackConfigClient from '../build/webpack.config.client'
-import historyApiFallback from 'koa-connect-history-api-fallback'
 import serve from 'koa-static'
 import proxy from 'koa-proxy'
 import fs from 'fs-extra'
@@ -24,15 +23,6 @@ export default async () => {
     app.use(convert(proxy(config.proxy.options)))
   }
 
-  if (!config.universal || !config.universal.enabled) {
-    // This rewrites all routes requests to the root /index.html file
-    // (ignoring file requests).
-    debug('Enable HistoryApiFallback middleware.')
-    app.use(convert(historyApiFallback({
-      verbose: false
-    })))
-  }
-
   // ------------------------------------
   // Apply Webpack HMR Middleware
   // ------------------------------------
@@ -43,7 +33,7 @@ export default async () => {
     const { publicPath } = webpackConfigClient.output
 
     // Catch the hash of the build in order to use it in the universal middleware
-    config.universal && config.universal.enabled && compiler.plugin('done', stats => {
+    compiler.plugin('done', stats => {
       // Create client info from the fresh build
       clientInfo = {
         assetsByChunkName: {
@@ -62,25 +52,15 @@ export default async () => {
     // when the application is compiled.
     app.use(serve(paths.src('static')))
   } else {
-    if (config.universal.enabled) {
-      // Get assets from client_info.json
-      debug('Read client info.')
-      fs.readJSON(paths.dist(config.universal.client_info), (err, data) => {
-        if (err) {
-          debug('Failed to read client_data!')
-          return
-        }
-        clientInfo = data
-      })
-    } else {
-      debug(
-        'Server is being run outside of live development mode, meaning it will ' +
-        'only serve the compiled application bundle in ~/dist. Generally you ' +
-        'do not need an application server for this and can instead use a web ' +
-        'server such as nginx to serve your static files. See the "deployment" ' +
-        'section in the README for more information on deployment strategies.'
-      )
-    }
+    // Get assets from client_info.json
+    debug('Read client info.')
+    fs.readJSON(paths.dist(config.universal.client_info), (err, data) => {
+      if (err) {
+        debug('Failed to read client_data!')
+        throw Error(err)
+      }
+      clientInfo = data
+    })
 
     // Serving ~/dist by default. Ideally these files should be served by
     // the web server and not the app server when universal is turned off,
@@ -88,10 +68,8 @@ export default async () => {
     app.use(serve(paths.public()))
   }
 
-  if (config.universal && config.universal.enabled) {
-    let um = await universalMiddleware()
-    app.use(um.default(() => clientInfo))
-  }
+  let um = await universalMiddleware()
+  app.use(um.default(() => clientInfo))
 
   return app
 }

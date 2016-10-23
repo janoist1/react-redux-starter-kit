@@ -43,15 +43,6 @@ webpackConfigClient.output = {
 // ------------------------------------
 // Plugins
 // ------------------------------------
-if (!config.universal || !config.universal.enabled) {
-  webpackConfigClient.plugins.push(
-    new HelmetWebpackPlugin({
-      helmetProps: layout,
-      rootProps: config.app_mount_point
-    })
-  )
-}
-
 if (__DEV__) {
   debug('Enable plugins for live development (HMR, NoErrors).')
   webpackConfigClient.plugins.push(

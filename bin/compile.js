@@ -24,13 +24,11 @@ const clientInfo = paths.dist(config.universal.client_info)
     let {hash, version, assetsByChunkName} = stats
     await writeClientInfo({hash, version, assetsByChunkName})
 
-    if (config.universal && config.universal.enabled) {
-      debug('Run compiler for server')
-      stats = await webpackCompiler(webpackConfigServer)
-      if (stats.warnings.length && config.compiler_fail_on_warning) {
-        debug('Config set to fail on warning, exiting with status code "1".')
-        process.exit(1)
-      }
+    debug('Run compiler for server')
+    stats = await webpackCompiler(webpackConfigServer)
+    if (stats.warnings.length && config.compiler_fail_on_warning) {
+      debug('Config set to fail on warning, exiting with status code "1".')
+      process.exit(1)
     }
 
     debug('Copy static assets to dist folder.')

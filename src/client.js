@@ -6,6 +6,7 @@ import { syncHistoryWithStore } from 'react-router-redux'
 import createStore from './store/createStore'
 import AppContainer from './containers/AppContainer'
 import layout from '../config/layout'
+import { Resolver } from 'react-resolver'
 
 // ========================================================
 // Browser History Setup
@@ -51,8 +52,8 @@ let render = (routerKey = null) => {
       return
     }
 
-    ReactDOM.render(
-      <AppContainer
+    Resolver.render(
+      () => <AppContainer
         {...renderProps}
         store={store}
         history={history}
@@ -62,6 +63,7 @@ let render = (routerKey = null) => {
       />,
       MOUNT_NODE
     )
+
   })
 }
 

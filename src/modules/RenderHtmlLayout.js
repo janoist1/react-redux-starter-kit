@@ -9,7 +9,7 @@ import server from 'react-dom/server'
  * @param resolverPayload
  * @returns {string}
  */
-export function renderHtmlLayout(head, body, resolverPayload) {
+export function renderHtmlLayout(head, body, resolverPayload = '') {
   return '<!DOCTYPE html>' + (0, server.renderToStaticMarkup)(React.createElement(
       'html',
       head.htmlAttributes.toComponent(),

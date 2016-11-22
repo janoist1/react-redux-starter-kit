@@ -124,7 +124,7 @@ export default getClientInfo => async (ctx, next) => {
         )) // Pass a render function for context!
         .then(({Resolved, data}) => {
           content = renderToString(
-              <Resolved />
+            <Resolved />
           )
 
           head = Helmet.rewind()

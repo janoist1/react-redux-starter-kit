@@ -10,7 +10,8 @@ import AppContainer from './containers/AppContainer'
 import _debug from 'debug'
 import * as Assetic from './modules/Assetic'
 import defaultLayout from '../config/layout'
-import { renderHtmlLayout } from 'helmet-webpack-plugin'
+// import { renderHtmlLayout } from 'helmet-webpack-plugin'
+import { renderHtmlLayout } from 'modules/RenderHtmlLayout'
 import PrettyError from 'pretty-error'
 import config from '../config'
 import { Resolver } from 'react-resolver'
@@ -57,7 +58,7 @@ export default getClientInfo => async (ctx, next) => {
         ctx.status = 500
         ctx.body = renderHtmlLayout(head, <div dangerouslySetInnerHTML={{__html: content}} />)
 
-        resolve()
+        reject()
       }
 
       // This will be transferred to the client side in __LAYOUT__ variable
@@ -123,18 +124,13 @@ export default getClientInfo => async (ctx, next) => {
         )) // Pass a render function for context!
         .then(({Resolved, data}) => {
           content = renderToString(
-            <div>
-              <Helmet script={[
-                {type: 'text/javascript', innerHTML: `__REACT_RESOLVER_PAYLOAD__ = ${JSON.stringify(data)}`}
-              ]} />
               <Resolved />
-            </div>
           )
 
           head = Helmet.rewind()
           let body = <div key='body' {...config.app_mount_point} dangerouslySetInnerHTML={{__html: content}} />
           ctx.status = 200
-          ctx.body = renderHtmlLayout(head, [body, scripts])
+          ctx.body = renderHtmlLayout(head, [body, scripts], data)
 
           resolve()
 

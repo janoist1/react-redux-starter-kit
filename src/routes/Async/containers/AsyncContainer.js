@@ -17,9 +17,7 @@ const mapDispatchToProps = {
 }
 
 const mapStateToProps = (state) => ({
-  // This can be turned on when this pull request is merged!
-  // https://github.com/ericclemmons/react-resolver/pull/121
-  // fetchedData: state.fetchedData
+   fetchedData: state.fetchedData
 })
 
 /*  Note: mapStateToProps is where you should use `reselect` to create selectors, ie:
